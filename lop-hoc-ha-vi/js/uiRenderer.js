@@ -48,7 +48,7 @@ window.closeNotificationModal = function() {
     document.getElementById('customNotificationModal').classList.remove('show');
 }
 
-window.openLoginModal = function() {
+export function openLoginModal() {
     document.getElementById('loginModalOverlay').classList.add('show');
 }
 
