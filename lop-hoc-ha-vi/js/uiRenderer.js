@@ -1,30 +1,5 @@
 import { bigClassesDatabase, saveDatabaseStateLocally, saveToFirebase } from "./storage.js";
-
-const dropdownConfig = {
-    "Trong giờ học": {
-        "Đánh giá ngữ pháp": ["", "Xuất sắc 9-10", "Khá 7-8", "Trung bình 5-6", "Dưới 5", "Mất gốc (1-2)"],
-        "Đánh giá khả năng nói": ["", "A", "B", "C", "D"],
-        "Đánh giá khả năng nghe": ["", "A", "B", "C", "D"],
-        "Ý thức giờ học": ["", "Ngoan", "Thỉnh thoảng nói chuyện", "Nghịch nhưng cô nhắc vẫn nghe", "Tăng động"],
-        "Tâm lý học sinh": ["", "Thoải mái, vui vẻ", "Chán học muốn nghỉ", "Không chơi với ai", "Rụt rè ít nói"]
-    },
-    "Ý thức ôn bài ở nhà": {
-        "Thuộc từ mới": ["", "Tốt", "Khá", "Trung bình", "Yếu"],
-        "Ý thức làm BTVN": ["", "Làm và ôn bài đầy đủ", "Có buổi làm, có buổi thiếu", "Thường xuyên không làm", "Không bao giờ làm"],
-        "Thuộc ngữ pháp": ["", "Thuộc và biết cách áp dụng công thức", "Hiểu nhưng vẫn còn chưa vững...", "Gặp khó khăn...", "Không hiểu..."]
-    },
-    "Nhóm Đánh Giá Chung": {
-        "So với tháng trước": ["", "Tiến bộ nhanh", "Tiến bộ chậm", "Như cũ", "Kém đi", "Báo động"],
-        "Đề xuất của giáo viên": ["", "Can học vượt lớp", "Giữ nguyên", "GV Không thể dạy được", "Hà Vi không nên nhận dạy HS"]
-    }
-};
-
-function displayPhone(p) { 
-    if(!p || p === 'Chưa có' || p === 'undefined') return 'Chưa có';
-    let c = p.toString().replace(/\s+/g, ''); 
-    if(c.length === 10) return c.substring(0,4) + ' ' + c.substring(4,7) + ' ' + c.substring(7);
-    return p; 
-}
+import { dropdownConfig, displayPhone, getGroupKeyBySheet } from "./uiConfig.js";
 
 export function showToast(message) {
     let toast = document.createElement("div");
@@ -64,17 +39,9 @@ window.toggleGroupAccordion = function(headerElement) {
     headerElement.parentElement.classList.toggle('active');
 }
 
-function getGroupKeyBySheet(sheetName) {
-    const s = sheetName.trim();
-    if (["2", "3", "4", "5"].includes(s)) return { key: "TIEU_HOC", name: "Khối Tiểu Học (Lớp 2-5)" };
-    if (["6", "7", "8", "9"].includes(s)) return { key: "THCS", name: "Khối THCS (Lớp 6-9)" };
-    if (["10", "11", "12"].includes(s)) return { key: "THPT", name: "Khối THPT (Lớp 10-12)" };
-    if (["DH25", "DH26"].includes(s)) return { key: "DAI_HOC", name: "Khối Đại Học (DH25-26)" };
-    return { key: "KHAC", name: "Khối Khác / Sinh Viên" };
-}
-
 export function renderFullSystemUI() {
     const mainContainer = document.getElementById("dynamicMainContainer");
+    if (!mainContainer) return;
     mainContainer.innerHTML = "";
 
     const classKeys = Object.keys(bigClassesDatabase);
@@ -104,8 +71,10 @@ export function renderFullSystemUI() {
     classKeys.forEach(classKey => {
         const classObj = bigClassesDatabase[classKey];
         const groupInfo = getGroupKeyBySheet(classObj.sheet);
-        groupedData[groupInfo.key].classes.push({ key: classKey, data: classObj });
-        groupedData[groupInfo.key].totalStudents += classObj.students.length;
+        if (groupedData[groupInfo.key]) {
+            groupedData[groupInfo.key].classes.push({ key: classKey, data: classObj });
+            groupedData[groupInfo.key].totalStudents += classObj.students.length;
+        }
     });
 
     const groupOrder = ["TIEU_HOC", "THCS", "THPT", "DAI_HOC", "KHAC"];
@@ -180,13 +149,13 @@ export function renderFullSystemUI() {
     });
 }
 
-function renderAbsentRowsHtml(students) {
+export function renderAbsentRowsHtml(students) {
     const absentStudents = students.filter(s => s.status === 'absent');
     if (absentStudents.length === 0) return '<li><em>Chưa có học sinh vắng</em></li>';
     return absentStudents.map(s => `<li>• ${s.name} ${s.note ? '(' + s.note + ')' : '(Chưa rõ lý do)'}</li>`).join('');
 }
 
-function renderStudentCardsHtml(classKey, students) {
+export function renderStudentCardsHtml(classKey, students) {
     const disabledAttr = window.isLoggedIn ? '' : 'disabled';
     const readonlyAttr = window.isLoggedIn ? '' : 'readonly';
 
@@ -243,201 +212,6 @@ function renderStudentCardsHtml(classKey, students) {
     }).join('');
 }
 
-// Gắn các hàm tương tác học viên vào phạm vi window để HTML gọi trực tiếp được
-window.updateStudentStatus = function(classKey, studentId, status) {
-    if (!window.isLoggedIn) { alert("Vui lòng đăng nhập để thay đổi trạng thái!"); return; }
-    let student = bigClassesDatabase[classKey].students.find(s => s.id === studentId);
-    if (student) {
-        student.status = status;
-        saveDatabaseStateLocally();
-        saveToFirebase();
-        showToast("Đã chuyển sang: " + (status === 'present' ? 'Có mặt' : 'Vắng'));
-        
-        const classKeyId = classKey.replace(/\s+/g, '-');
-        const studentsArr = bigClassesDatabase[classKey].students;
-        const total = studentsArr.length;
-        const absent = studentsArr.filter(s => s.status === 'absent').length;
-        const present = total - absent;
-        
-        document.getElementById(`stats-${classKeyId}`).innerText = 'Sĩ số: ' + total + ' | Có mặt: ' + present + ' | Vắng: ' + absent;
-        document.getElementById(`absentList-${classKeyId}`).innerHTML = renderAbsentRowsHtml(studentsArr);
-        document.getElementById(`studentList-${classKeyId}`).innerHTML = renderStudentCardsHtml(classKey, studentsArr);
-    }
-}
-
-window.updateStudentNote = function(classKey, studentId, value) {
-    if (!window.isLoggedIn) return;
-    let student = bigClassesDatabase[classKey].students.find(s => s.id === studentId);
-    if (student) {
-        student.note = value;
-        saveDatabaseStateLocally();
-        saveToFirebase();
-        showToast("Đã lưu ghi chú!");
-        const classKeyId = classKey.replace(/\s+/g, '-');
-        document.getElementById(`absentList-${classKeyId}`).innerHTML = renderAbsentRowsHtml(bigClassesDatabase[classKey].students);
-    }
-}
-
-window.updateStudentEvaluation = function(classKey, studentId, criterionName, value) {
-    if (!window.isLoggedIn) { alert("Vui lòng đăng nhập để đánh giá!"); return; }
-    let student = bigClassesDatabase[classKey].students.find(s => s.id === studentId);
-    if (student) {
-        student[criterionName] = value;
-        saveDatabaseStateLocally();
-        saveToFirebase();
-        showToast("Đã cập nhật: " + criterionName);
-    }
-}
-
-window.addNewStudentToClass = function(classKey) {
-    if (!window.isLoggedIn) return;
-    const classKeyId = classKey.replace(/\s+/g, '-');
-    const nameInput = document.getElementById(`inputName-${classKeyId}`);
-    const phoneInput = document.getElementById(`inputPhone-${classKeyId}`);
-    const name = nameInput.value.trim();
-    const phone = phoneInput.value.trim();
-
-    if (!name) { alert("Vui lòng điền họ tên học sinh!"); return; }
-
-    const studentsArr = bigClassesDatabase[classKey].students;
-    const nextId = studentsArr.length > 0 ? Math.max(...studentsArr.map(s => s.id)) + 1 : 1;
-
-    studentsArr.push({
-        id: nextId,
-        name: name,
-        phone: phone || "Chưa có",
-        status: "present",
-        note: ""
-    });
-
-    nameInput.value = "";
-    phoneInput.value = "";
-    saveDatabaseStateLocally();
-    saveToFirebase();
-
-    const total = studentsArr.length;
-    const absent = studentsArr.filter(s => s.status === 'absent').length;
-    const present = total - absent;
-    document.getElementById(`stats-${classKeyId}`).innerText = 'Sĩ số: ' + total + ' | Có mặt: ' + present + ' | Vắng: ' + absent;
-    document.getElementById(`studentList-${classKeyId}`).innerHTML = renderStudentCardsHtml(classKey, studentsArr);
-    showToast("Đã thêm học sinh mới!");
-}
-
-window.deleteStudentFromClass = function(classKey, studentId, studentName) {
-    if (!window.isLoggedIn) { alert("Vui lòng đăng nhập để xóa!"); return; }
-    if (confirm(`Bạn chắc chắn muốn xoá học viên "${studentName}" không?`)) {
-        bigClassesDatabase[classKey].students = bigClassesDatabase[classKey].students.filter(s => s.id !== studentId);
-        saveDatabaseStateLocally();
-        saveToFirebase();
-
-        const classKeyId = classKey.replace(/\s+/g, '-');
-        const studentsArr = bigClassesDatabase[classKey].students;
-        const total = studentsArr.length;
-        const absent = studentsArr.filter(s => s.status === 'absent').length;
-        const present = total - absent;
-
-        document.getElementById(`stats-${classKeyId}`).innerText = 'Sĩ số: ' + total + ' | Có mặt: ' + present + ' | Vắng: ' + absent;
-        document.getElementById(`absentList-${classKeyId}`).innerHTML = renderAbsentRowsHtml(studentsArr);
-        document.getElementById(`studentList-${classKeyId}`).innerHTML = renderStudentCardsHtml(classKey, studentsArr);
-        showToast("Đã xóa học viên!");
-    }
-}
-
-window.copyAbsentReport = function(classKey) {
-    const students = bigClassesDatabase[classKey].students;
-    const absentArr = students.filter(s => s.status === 'absent');
-    let msg = `DANH SÁCH VẮNG LỚP ${classKey}:\n`;
-    if(absentArr.length === 0) {
-        msg += "- Hôm nay không có ai vắng.";
-    } else {
-        absentArr.forEach((s, idx) => {
-            msg += `${idx+1}. ${s.name} ${s.note ? '('+s.note+')' : '(Chưa rõ lý do)'}\n`;
-        });
-    }
-    navigator.clipboard.writeText(msg).then(() => {
-        showToast("Đã sao chép báo cáo vắng!");
-    });
-}
-
-window.handleSearchKeyPress = function(event) {
-    if (event.key === "Enter") window.searchGlobalStudent();
-}
-
-window.searchGlobalStudent = function() {
-    const query = document.getElementById("globalSearchInput").value.trim().toLowerCase();
-    const resultBox = document.getElementById("searchResultBox");
-    const tableBody = document.getElementById("resultTableBody");
-    const countSpan = document.getElementById("resultCount");
-
-    if (!query) { resultBox.style.display = "none"; return; }
-
-    tableBody.innerHTML = "";
-    let count = 0;
-
-    Object.keys(bigClassesDatabase).forEach(classKey => {
-        bigClassesDatabase[classKey].students.forEach(s => {
-            if (s.name.toLowerCase().includes(query) || s.phone.toString().includes(query)) {
-                count++;
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td style="font-weight:bold; color:#fff;">${s.name}</td>
-                    <td>${displayPhone(s.phone)}</td>
-                    <td><span style="color:#00f0ff; font-weight:bold; cursor:pointer; text-decoration:underline;" onclick="window.focusToCard('${classKey}', ${s.id})">${classKey}</span></td>
-                    <td><button class="btn-call" onclick="window.location.href='tel:${s.phone}'">Gọi</button></td>
-                `;
-                tableBody.appendChild(tr);
-            }
-        });
-    });
-
-    countSpan.innerText = `(${count} kết quả)`;
-    resultBox.style.display = "block";
-}
-
-window.focusToCard = function(classKey, studentId) {
-    const clsObj = bigClassesDatabase[classKey];
-    if (!clsObj) return;
-    const groupInfo = getGroupKeyBySheet(clsObj.sheet);
-
-    const groupWrapper = document.getElementById(`group-wrapper-${groupInfo.key}`);
-    if (groupWrapper && !groupWrapper.classList.contains('active')) groupWrapper.classList.add('active');
-
-    const subClasses = document.querySelectorAll(`[data-classname-box="${classKey}"]`);
-    subClasses.forEach(box => { if (!box.classList.contains('active')) box.classList.add('active'); });
-
-    setTimeout(() => {
-        const cardId = `card-${classKey.replace(/\s+/g, '-')}-${studentId}`;
-        const card = document.getElementById(cardId);
-        if (card) {
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            card.classList.add('highlight-search');
-            setTimeout(() => card.classList.remove('highlight-search'), 2500);
-        }
-    }, 150);
-}
-
-window.clearSystemCache = function() {
-    if (!window.isLoggedIn) { alert("Bạn cần đăng nhập để thực hiện tính năng này!"); return; }
-    if (confirm("Bạn có chắc chắn muốn xóa dữ liệu cũ không?")) {
-        localStorage.clear();
-        setBigClassesDatabase({});
-        document.getElementById('fileStatusMessage').style.color = "#ff007f";
-        document.getElementById('fileStatusMessage').innerText = "Chưa có dữ liệu học viên. Vui lòng chọn tệp Excel.";
-        document.getElementById('searchResultBox').style.display = 'none';
-        renderFullSystemUI();
-        showToast("Đã xóa dữ liệu hệ thống!");
-    }
-}
-
-window.togglePasswordVisibility = function() {
-    const passwordInput = document.getElementById("loginPassword");
-    
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-    } else {
-        passwordInput.type = "password";
-    }
-}
-
+// Đăng ký window cho các hàm gọi onclick trong HTML
 window.openLoginModal = openLoginModal;
 window.closeLoginModal = closeLoginModal;
