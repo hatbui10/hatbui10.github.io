@@ -438,3 +438,6 @@ window.togglePasswordVisibility = function() {
         passwordInput.type = "password";
     }
 }
+
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
