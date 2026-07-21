@@ -1,1 +1,138 @@
 
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background-color: #050508; color: #e0e0e6; padding: 20px 8px; max-width: 600px; margin: 0 auto; }
+
+h2 { text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); font-size: 1.4rem; }
+h3 { color: #ff007f; text-shadow: 0 0 10px rgba(255, 0, 127, 0.5); font-size: 1.1rem; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+
+/* 🔐 KHU VỰC ĐĂNG NHẬP / XÁC THỰC */
+.auth-bar { display: flex; justify-content: space-between; align-items: center; background: #0d0d1a; border: 1px solid #00f0ff; border-radius: 6px; padding: 10px 15px; margin-bottom: px; font-size: 0.85rem; }
+.auth-btn { background: #00f0ff; color: #000; border: none; padding: 6px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; }
+.auth-btn-danger { background: #ff007f; color: #fff; border: none; padding: 6px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; }
+
+/* 📂 KHU VỰC TẢI FILE */
+.upload-card { background: #0a0a14; border: 1px solid #ffd700; border-radius: 6px; padding: 15px 10px; margin-bottom: 15px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.1); }
+.upload-card p { font-size: 0.85rem; color: #aaa; text-align: center; margin-bottom: 12px; }
+.btn-group-top { width: 100%; display: block; text-align: center; margin-bottom: 5px; }
+
+.custom-upload-btn { 
+    display: inline-block; width: 48%; background: transparent; border: 1px solid #00f0ff; color: #00f0ff; 
+    padding: 12px 5px; font-weight: bold; font-size: 0.85rem; border-radius: 25px; cursor: pointer; 
+    text-transform: uppercase; text-align: center; margin-right: 2%; box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+}
+.custom-upload-btn:active { background: #00f0ff; color: #000; }
+
+.btn-danger-top { 
+    display: inline-block; width: 48%; background: transparent; border: 1px solid #ff007f; color: #ff007f; 
+    padding: 12px 5px; font-weight: bold; font-size: 0.85rem; border-radius: 20px; cursor: pointer; 
+    text-transform: uppercase; text-align: center; box-shadow: 0 0 8px rgba(255, 0, 127, 0.2);
+}
+.btn-danger-top:active { background: #ff007f; color: #fff; }
+.file-status { font-size: 0.85rem; color: #ffd700; text-align: center; margin-top: 12px; font-weight: bold; line-height: 1.3; white-space: pre-line; }
+
+/* ⏳ PROGRESS BAR */
+.progress-container { width: 100%; background-color: #050508; border: 1px solid #333; border-radius: 4px; margin: 10px 0; display: none; overflow: hidden; }
+.progress-bar { width: 0%; height: 16px; background-color: #00ff66; text-align: center; line-height: 16px; color: #000; font-weight: bold; font-size: 0.75rem; transition: width 0.1s ease; box-shadow: 0 0 10px #00ff66; }
+
+/* 🔍 KHU VỰC TÌM KIẾM HỌC VIÊN CHUNG */
+.search-box { display: block; background: #0d0d1a; border: 1px solid #333; border-radius: 4px; padding: 10px; margin-bottom: 15px; text-align: center; }
+.search-input { width: 73%; background: #050508; border: 1px solid #333; color: #fff; padding: 10px; font-size: 0.9rem; border-radius: 4px; outline: none; margin-right: 2%; display: inline-block; vertical-align: middle; }
+.search-input:focus { border-color: #ffd700; }
+.search-btn { width: 23%; background: #ffd700; color: #000; border: none; padding: 11px 0; font-weight: bold; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; display: inline-block; vertical-align: middle; }
+
+/* 📊 KẾT QUẢ TÌM KIẾM TRÊN BẢNG */
+.search-result-panel { background: #1a0813; border: 1px dashed #ff007f; border-radius: 4px; padding: 12px 8px; margin-bottom: 15px; display: none; }
+.result-title { color: #ff007f; font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.result-table { width: 100%; border-collapse: collapse; }
+.result-table th, .result-table td { border: 1px solid rgba(255, 0, 127, 0.2); padding: 8px 5px; text-align: left; font-size: 0.8rem; }
+.result-table th { background-color: #4a0025; color: #fff; text-transform: uppercase; font-size: 0.75rem; }
+.result-table tr:nth-child(even) { background-color: rgba(255, 0, 127, 0.03); }
+
+/* 📦 KHỐI NHÓM LỚP */
+.group-block-wrapper { margin-bottom: 20px; background: #04040a; border: 1px solid #ffd700; border-radius: 8px; overflow: hidden; box-shadow: 0 0 12px rgba(255, 215, 0, 0.05); }
+.group-accordion-header { padding: 14px 12px; background: #111122; cursor: pointer; user-select: none; transition: background 0.2s; position: relative; border-bottom: 2px solid #ffd700; display: flex; justify-content: space-between; align-items: center; }
+.group-accordion-header:active { background: #1c1c38; }
+.group-accordion-header::after { content: '▼'; color: #ffd700; font-size: 0.9rem; transition: transform 0.3s; margin-left: 10px; }
+.group-block-wrapper.active .group-accordion-header::after { content: '▲'; }
+.group-main-title { color: #ffd700; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; text-shadow: 0 0 8px rgba(255, 215, 0, 0.2); }
+.group-stats { color: #aaa; font-size: 0.85rem; font-weight: bold; }
+.group-panel { padding: 12px 6px; display: none; background: #06060c; }
+.group-block-wrapper.active .group-panel { display: block; }
+
+/* 🏫 KHỐI LỚP CON ACCORDION */
+.class-block-wrapper { margin-bottom: 12px; background: #0a0a14; border: 1px solid #333; border-radius: 6px; overflow: hidden; }
+.class-accordion-header { padding: 12px 10px; background: #0d0d1f; cursor: pointer; user-select: none; transition: background 0.2s; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+.class-accordion-header:active { background: #151530; }
+.class-accordion-header::after { content: '▼'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #00f0ff; font-size: 0.8rem; transition: transform 0.3s; }
+.class-block-wrapper.active .class-accordion-header::after { content: '▲'; color: #00ff66; }
+
+.class-main-title { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.3); font-size: 1.15rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+.class-schedule { color: #ff007f; font-size: 0.85rem; margin-top: 2px; }
+.class-stats { text-align: left; color: #00ff66; font-size: 0.85rem; margin-top: 3px; font-weight: 500; }
+
+.class-panel { padding: 15px 8px; display: none; background: #0a0a14; }
+.class-block-wrapper.active .class-panel { display: block; }
+
+.add-student-box { display: flex; flex-direction: column; gap: 8px; background: #0d0d1a; border: 1px solid #ffd700; border-radius: 4px; padding: 12px 10px; margin-bottom: 15px; }
+.add-student-box input { width: 100%; background: #050508; border: 1px solid #333; color: #fff; padding: 10px; font-size: 0.9rem; border-radius: 4px; outline: none; }
+.add-student-box input:focus { border-color: #ffd700; }
+.btn-add { background: #ffd700; color: #000; border: none; padding: 10px; font-weight: bold; font-size: 0.9rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+
+.absent-section { background: rgba(255, 0, 127, 0.05); border: 1px dashed #ff007f; border-radius: 4px; padding: 10px; margin-bottom: 20px; }
+.absent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.absent-title { color: #ff007f; font-weight: bold; font-size: 0.9rem; }
+.copy-btn { background: #ff007f; color: #fff; border: none; padding: 6px 12px; font-size: 0.8rem; font-weight: bold; border-radius: 3px; cursor: pointer; box-shadow: 0 0 8px #ff007f; }
+.absent-list { list-style: none; font-size: 0.9rem; color: #ff55a5; line-height: 1.4; }
+.absent-list li { padding: 3px 0; border-bottom: 1px solid rgba(255, 0, 127, 0.1); }
+
+.student-list { display: flex; flex-direction: column; gap: 10px; }
+.student-card { background: #121224; border: 1px solid #333; border-left: 4px solid #00f0ff; border-radius: 4px; padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; transition: background 0.2s; }
+.student-card.status-absent { border-left-color: #ff007f; background: #1a0813; }
+.student-card.status-present { border-left-color: #00ff66; background: #081a10; }
+.student-card.highlight-search { border: 1px solid #ffd700 !important; box-shadow: 0 0 12px rgba(255, 215, 0, 0.4); }
+
+.student-info-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid #222; padding-bottom: 6px; }
+.student-meta { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.student-name { font-weight: bold; font-size: 0.95rem; color: #fff; }
+.student-phone { font-size: 0.8rem; color: #888; }
+
+.student-actions-right { display: flex; gap: 5px; }
+.btn-call { background: #ffd700; color: #000; padding: 4px 8px; font-size: 0.8rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.btn-delete { background: #4a0000; color: #ff3333; border: 1px solid #ff3333; padding: 6px 10px; font-size: 0.8rem; border-radius: 4px; cursor: pointer; }
+
+.student-controls-row { display: flex; gap: 6px; align-items: center; }
+.btn-action { flex: 1; padding: 10px 3px; font-size: 0.8rem; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; text-align: center; color: #fff; background: #333; }
+.btn-absent { background: #4a0025; color: #ff007f; border: 1px solid #ff007f; }
+.btn-absent.active { background: #ff007f; color: #fff; box-shadow: 0 0 10px #ff007f; }
+.btn-present { background: #003311; color: #00ff66; border: 1px solid #00ff66; }
+.btn-present.active { background: #00ff66; color: #000; box-shadow: 0 0 10px #00ff66; }
+.note-select { flex: 1.5; background: #1a1a3a; color: #00f0ff; border: 1px solid #00f0ff; padding: 9px 3px; font-size: 0.8rem; border-radius: 3px; outline: none; }
+
+.empty-alert { text-align: center; padding: 40px 10px; color: #555; font-style: italic; font-size: 0.95rem; }
+
+/* Toast Notification */
+.toast-msg {
+    position: fixed; bottom: 20px; right: 20px; background: #00ff66; color: #000;
+    padding: 10px 20px; border-radius: 4px; font-weight: bold; z-index: 10000;
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.5); opacity: 0; transition: opacity 0.3s;
+}
+.toast-msg.show { opacity: 1; }
+
+/* 🔔 HỘP THOẠI THÔNG BÁO NỔI (MODAL POPUP) */
+.custom-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center;
+    align-items: center; z-index: 9999; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.custom-modal-overlay.show { opacity: 1; pointer-events: auto; }
+.custom-modal-box {
+    background: #0d0d21; border: 2px solid #00ff66; border-radius: 8px;
+    padding: 22px 18px; max-width: 90%; width: 420px; text-align: center;
+    box-shadow: 0 0 25px rgba(0, 255, 102, 0.4);
+    transform: scale(0.8); transition: transform 0.3s ease;
+}
+.custom-modal-overlay.show .custom-modal-box { transform: scale(1); }
+.modal-title { color: #00ff66; font-size: 1.25rem; font-weight: bold; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }
+.modal-body { color: #e0e0e6; font-size: 0.95rem; margin-bottom: 2px; line-height: 1.5; text-align: left; white-space: pre-line; }
+.modal-btn { background: #00ff66; color: #000; border: none; padding: 5px 10px; font-weight: bold; font-size: 0.9rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 1px; box-shadow: 0 0 8px #00ff66; }
