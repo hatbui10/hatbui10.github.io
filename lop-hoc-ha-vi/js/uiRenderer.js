@@ -52,7 +52,7 @@ window.openLoginModal = function() {
     document.getElementById('loginModalOverlay').classList.add('show');
 }
 
-window.closeLoginModal = function() {
+export function closeLoginModal() {
     document.getElementById('loginModalOverlay').classList.remove('show');
 }
 
